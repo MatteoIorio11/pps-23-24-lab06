@@ -2,6 +2,7 @@ package ex2
 
 import scala.compiletime.ops.int
 import scala.collection.mutable.ArrayBuffer
+import ex2.ConferenceUtility.average
 
 enum Question:
     case RELEVANCE
@@ -22,8 +23,11 @@ class ConferenceReviewing extends Reviewing:
 
     override def averageFinalScore(article: Int): Double = 
         require(article >= 0)
-        val optScores = internalScores.get(article)
-        0
+        var optMap = internalScores.get(article)
+        if optMap.isEmpty then return 0
+        else
+            return optMap.get.average(Question.FINAL)
+
 
 
     override def averageWeightedFinalScoreMap: Map[Int, Double] = ???
@@ -66,3 +70,14 @@ class ConferenceReviewing extends Reviewing:
             val newMap = scores.map((k, value) => (k, ArrayBuffer(value)))
             internalScores += (article -> newMap)
 
+    override def toString(): String = "Reviews: " + internalScores
+
+object ConferenceUtility:
+    extension (map: Map[Question, ArrayBuffer[Int]])
+        def average(key: Question): Double = 
+            val values = map(key)
+            val size = values.size
+            var accumulator = 0.0
+            for value <- values do accumulator += value
+            println(accumulator / size)
+            return accumulator / size
