@@ -45,10 +45,19 @@ enum List[A]:
     case h :: t => t.foldLeft(h)(op)
 
   // Exercise: implement the following methods
-  def zipWithValue[B](value: B): List[(A, B)] = ???
-  def length(): Int = ???
-  def zipWithIndex: List[(A, Int)] = ???
-  def partition(predicate: A => Boolean): (List[A], List[A]) = ???
+  def zipWithValue[B](value: B): List[(A, B)] = foldRight(List[(A, B)]())
+    ((elm, list) => (elm, value)::list)
+  
+  final def length(): Int =  foldLeft(0)((x, _) => x + 1)
+  def count(e: A): Int = foldLeft(0)((counter, curr_el) => counter + (if curr_el == e then 1 else 0))
+  
+  
+  def zipWithIndex: List[(A, Int)] = foldRight(List[(A, Int)]())((elm, list) => 
+    (if list.head.isDefined then (elm, list.head.get._2 + 1) else (elm, 0))::list)
+
+  def partition(predicate: A => Boolean): (List[A], List[A]) = foldRight(List[A](), List[A]())
+    ((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
+
   def span(predicate: A => Boolean): (List[A], List[A]) = ???
   def takeRight(n: Int): List[A] = ???
   def collect(predicate: PartialFunction[A, A]): List[A] = ???
@@ -67,11 +76,11 @@ object Test extends App:
 
   import List.*
   val reference = List(1, 2, 3, 4)
-  println(reference.zipWithValue(10)) // List((1, 10), (2, 10), (3, 10), (4, 10))
-  println(reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
-  println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
-  println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
-  println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
+  println("zipWithValue:" + reference.zipWithValue(10)) // List((1, 10), (2, 10), (3, 10), (4, 10))
+  println("zipWithIndex: " + reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
+  println("partition:" + reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
+  println("span: " + reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
+  println("span: " + reference.span(_ < 3)) // (List(1, 2), List(3, 4))
   println(reference.reduce(_ + _)) // 10
   println(List(10).reduce(_ + _)) // 10
   println(reference.takeRight(3)) // List(2, 3, 4)
