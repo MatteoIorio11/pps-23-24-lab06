@@ -34,7 +34,12 @@ class ConferenceReviewing extends Reviewing:
 
     override def sortedAcceptedArticles: List[(Int, Double)] = ???
 
-    override def acceptedArticles: Set[Int] = ???
+    override def acceptedArticles: Set[Int] = 
+        internalScores.filter((key, value) => 
+            value.find((question, scores) => 
+                question == Question.RELEVANCE && scores.find(score => score >= ConferenceReviewing.RELEVANCE_LOWER_BOUND).isDefined).isDefined)
+            .filter((article, questions) => averageFinalScore(article) > ConferenceReviewing.AVERAGE_FINAL)
+            .map((article, _) => article).toSet
 
     override def orderedScores(article: Int, question: Question): List[Int] =
         require(article >= 0)
@@ -72,6 +77,9 @@ class ConferenceReviewing extends Reviewing:
 
     override def toString(): String = "Reviews: " + internalScores
 
+object ConferenceReviewing:
+    private val AVERAGE_FINAL = 5.0
+    private val RELEVANCE_LOWER_BOUND = 8
 object ConferenceUtility:
     extension (map: Map[Question, ArrayBuffer[Int]])
         def average(key: Question): Double = 
