@@ -62,7 +62,7 @@ enum List[A]:
     ((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
   
   def takeRight(n: Int): List[A] = ???
-  def collect(predicate: PartialFunction[A, A]): List[A] = ???
+  def collect(predicate: PartialFunction[A, A]): List[A] = foldLeft((List[A]()))((list, el) => (predicate(el)::list))
 // Factories
 object List:
 
