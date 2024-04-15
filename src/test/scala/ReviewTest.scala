@@ -35,4 +35,7 @@ class ReviewTest:
         assertEquals(cr.averageFinalScore(3),3.5,0.01);
         assertEquals(cr.averageFinalScore(4),7.0,0.01);
         assertEquals(cr.averageFinalScore(5),10.0,0.01);
+
+    @Test def testAcceptedArticles(): Unit = 
+        assertEquals(cr.acceptedArticles, Set(1,2,4));
         
