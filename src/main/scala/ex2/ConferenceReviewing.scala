@@ -86,7 +86,7 @@ class ConferenceReviewing extends Reviewing:
 object ConferenceReviewing:
     private val AVERAGE_FINAL = 5.0
     private val RELEVANCE_LOWER_BOUND = 8
-    private val AVG_WEIGHTED_VALUE = 10
+    private val AVG_WEIGHTED_VALUE = 10.0
 object ConferenceUtility:
     extension (map: Map[Question, ArrayBuffer[Int]])
         def average(key: Question): Double = 
