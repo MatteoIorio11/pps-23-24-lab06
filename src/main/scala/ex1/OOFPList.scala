@@ -56,7 +56,9 @@ enum List[A]:
   def zipWithIndex: List[(A, Int)] = foldRight(List[(A, Int)]())((elm, list) => 
     (if list.head.isDefined then (elm, list.head.get._2 + 1) else (elm, 0))::list)
 
-  def partition(predicate: A => Boolean): (List[A], List[A]) = foldWithPredicate(predicate)(this)
+  def partition(predicate: A => Boolean): (List[A], List[A]) =
+    foldRight(List[A](), List[A]())((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
+
   def span(predicate: A => Boolean): (List[A], List[A]) = foldWithPredicate(predicate)(this)
 
   private def foldWithPredicate(predicate: A => Boolean)(list: List[A]): (List[A], List[A]) =
