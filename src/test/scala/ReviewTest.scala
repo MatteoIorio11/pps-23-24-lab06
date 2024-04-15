@@ -44,4 +44,7 @@ class ReviewTest:
         List((4,7.0),
         (2,7.5),
         (1,8.5)));
-        
+    @Test def testAverageWeightedFinalScore(): Unit = 
+            assertEquals(cr.averageWeightedFinalScoreMap.get(1).get,(4.8+5.4)/2,0.01);
+            assertEquals(cr.averageWeightedFinalScoreMap.get(2).get,(9.0+6.0)/2,0.01);
+            assertEquals(cr.averageWeightedFinalScoreMap.size,5);
