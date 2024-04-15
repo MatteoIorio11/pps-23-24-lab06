@@ -16,6 +16,7 @@ trait Reviewing:
     def averageWeightedFinalScoreMap: Map[Int, Double]
 
 class ConferenceReviewing extends Reviewing:
+    private var internalScores = scala.collection.mutable.Map[Int, Map[Question, Int]]()
 
     override def averageFinalScore(article: Int): Double = ???
 
@@ -27,9 +28,20 @@ class ConferenceReviewing extends Reviewing:
 
     override def orderedScores(article: Int, question: Question): List[Int] = ???
 
-    override def loadReview(article: Int, relevance: Int, significance: Int, confidence: Int, fin: Int): Unit = ???
+    override def loadReview(article: Int, relevance: Int, significance: Int, confidence: Int, fin: Int): Unit = 
+        var scores = Map[Question, Int]()
+        require(relevance >= 0 && relevance <= 10)
+        require(significance >= 0 && significance <= 10)
+        require(confidence >= 0 && confidence <= 10)
+        require(fin >= 0 && fin <= 10)
+        scores += (Question.RELEVANCE -> relevance)
+        scores += (Question.SIGNIFICANCE -> significance)
+        scores += (Question.CONFIDENCE -> confidence)
+        scores += (Question.FINAL -> fin)
+        loadReview(article = article, scores = scores)
 
-    override def loadReview(article: Int, scores: Map[Question, Int]): Unit = ???
+    override def loadReview(article: Int, scores: Map[Question, Int]): Unit = 
+        internalScores += (article -> scores)
 
     private val scores = Map[Int, Map[Question, Int]]()
 
