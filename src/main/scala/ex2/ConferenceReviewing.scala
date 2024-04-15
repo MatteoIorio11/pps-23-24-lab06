@@ -33,8 +33,7 @@ class ConferenceReviewing extends Reviewing:
     override def averageWeightedFinalScoreMap: Map[Int, Double] = ???
 
     override def sortedAcceptedArticles: List[(Int, Double)] = 
-        val accpArticles = acceptedArticles
-        accpArticles.map((article) => (article, averageFinalScore(article)))
+        acceptedArticles.map((article) => (article, averageFinalScore(article)))
             .toList
             .sortWith((el1, el2) => el1._2.compareTo(el2._2) < 0)
 
