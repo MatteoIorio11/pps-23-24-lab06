@@ -25,7 +25,16 @@ class ConferenceReviewing extends Reviewing:
 
     override def acceptedArticles: Set[Int] = ???
 
-    override def orderedScores(article: Int, question: Question): List[Int] = ???
+    override def orderedScores(article: Int, question: Question): List[Int] =
+        require(article >= 0)
+        require(question != null)
+        val optMap = internalScores.get(article)
+        if optMap.isDefined then
+            val optQuestionMap = optMap.get.get(question)
+            if optQuestionMap.isDefined then
+                return optQuestionMap.get.sortWith((x, y) => x < y).toList
+        List()
+
 
     override def loadReview(article: Int, relevance: Int, significance: Int, confidence: Int, fin: Int): Unit = 
         var scores = Map[Question, Int]()
