@@ -1,5 +1,8 @@
 package ex2
 
+import scala.compiletime.ops.int
+import scala.collection.mutable.ArrayBuffer
+
 enum Question:
     case RELEVANCE
     case SIGNIFICANCE
@@ -17,7 +20,11 @@ trait Reviewing:
 class ConferenceReviewing extends Reviewing:
     private var internalScores = scala.collection.mutable.Map[Int, Map[Question, scala.collection.mutable.ArrayBuffer[Int]]]()
 
-    override def averageFinalScore(article: Int): Double = ???
+    override def averageFinalScore(article: Int): Double = 
+        require(article >= 0)
+        val optScores = internalScores.get(article)
+        0
+
 
     override def averageWeightedFinalScoreMap: Map[Int, Double] = ???
 
@@ -54,7 +61,8 @@ class ConferenceReviewing extends Reviewing:
         if internalScores.isDefinedAt(article) then
             internalScores(article)
               .foreachEntry((question, score) =>
-                  scores.foreachEntry((key, list) => if question == key then score += list))
-
-
+                  scores.foreachEntry((key, value) => if question == key then score ++= ArrayBuffer(value)))
+        else
+            val newMap = scores.map((k, value) => (k, ArrayBuffer(value)))
+            internalScores += (article -> newMap)
 
