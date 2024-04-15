@@ -10,6 +10,7 @@ enum List[A]:
     case h :: t => Some(h)  // pattern for scala.Option
     case _ => None          // pattern for scala.Option
 
+
   def tail: Option[List[A]] = this match
     case h :: t => Some(t)
     case _ => None
@@ -55,11 +56,20 @@ enum List[A]:
   def zipWithIndex: List[(A, Int)] = foldRight(List[(A, Int)]())((elm, list) => 
     (if list.head.isDefined then (elm, list.head.get._2 + 1) else (elm, 0))::list)
 
-  def partition(predicate: A => Boolean): (List[A], List[A]) = foldRight(List[A](), List[A]())
-    ((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
+  def partition(predicate: A => Boolean): (List[A], List[A]) = foldWithPredicate(predicate)(this)
+  def span(predicate: A => Boolean): (List[A], List[A]) = foldWithPredicate(predicate)(this)
 
-  def span(predicate: A => Boolean): (List[A], List[A]) = foldRight(List[A](), List[A]())
-    ((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
+  private def foldWithPredicate(predicate: A => Boolean)(list: List[A]): (List[A], List[A]) =
+    var listA = List[A]()
+    var listB = List[A]()
+    var continue = true
+    for element <- this do 
+      if (predicate(element) && continue) then
+        listA = listA.append(element::Nil())
+      else
+        continue = false
+        listB = listB.append(element::Nil())
+    (listA, listB)
   
   def takeRight(n: Int): List[A] = _take(0, this) 
     private def _take(n: Int, list: List[A]): List[A] = list match
@@ -67,9 +77,9 @@ enum List[A]:
       case h::t if (n == 0) => t
       case _ => list
     
-
     
-  def collect(predicate: PartialFunction[A, A]): List[A] = foldLeft((List[A]()))((list, el) => (predicate(el)::list))
+  def collect(predicate: PartialFunction[A, A]): List[A] = foldRight((List[A]()))(
+    (el, list) => (if predicate.isDefinedAt(el) then predicate(el)::list else list))
 // Factories
 object List:
 
@@ -80,14 +90,13 @@ object List:
 
   def of[A](elem: A, n: Int): List[A] =
     if n == 0 then Nil() else elem :: of(elem, n - 1)
-
 object Test extends App:
 
   import List.*
   val reference = List(1, 2, 3, 4)
-  println("zipWithValue:" + reference.zipWithValue(10)) // List((1, 10), (2, 10), (3, 10), (4, 10))
+  println("zipWithValue: " + reference.zipWithValue(10)) // List((1, 10), (2, 10), (3, 10), (4, 10))
   println("zipWithIndex: " + reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
-  println("partition:" + reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
+  println("partition: " + reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
   println("span: " + reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println("span: " + reference.span(_ < 3)) // (List(1, 2), List(3, 4))
   println("reduce: " + reference.reduce(_ + _)) // 10
