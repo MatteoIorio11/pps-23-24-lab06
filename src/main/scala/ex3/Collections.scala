@@ -3,6 +3,8 @@ package ex3
 import java.util.concurrent.TimeUnit
 
 import scala.concurrent.duration.FiniteDuration
+import scala.collection.mutable.ListBuffer
+import java.util.Random
 
 object PerformanceUtils:
   case class MeasurementResults[T](result: T, duration: FiniteDuration) extends Ordered[MeasurementResults[_]]:
@@ -17,18 +19,35 @@ object PerformanceUtils:
 
   def measure[T](expr: => T): MeasurementResults[T] = measure("")(expr)
 
+  def separate: Unit = println("<><><><><><><><><>")
+
 @main def checkPerformance: Unit =
+  import PerformanceUtils.*
+  
+  val upperBound = 10_000_000
+  val lowerBound = 1
+  val position = 100_000
+  val rangeValues = (lowerBound to upperBound)
 
   /* Linear sequences: List, ListBuffer */
+  val immList = rangeValues.toList
+  val mutList = ListBuffer.range(lowerBound, upperBound)
+  val randomUpdateIndex = Random().nextInt(position, upperBound)
+  assert(measure("[Immutable List] Get element")(immList(position)) > measure("[Mutable List] Get element")(mutList(position)))
+  separate
+  assert(measure("[Immutable List] Update element")(immList.updated(randomUpdateIndex, 2)) > measure("[Mutable List] Update Element")(mutList.update(randomUpdateIndex, 1))) 
+  separate
+
+
 
   /* Indexed sequences: Vector, Array, ArrayBuffer */
+
 
   /* Sets */
 
   /* Maps */
 
   /* Comparison */
-  import PerformanceUtils.*
   val lst = (1 to 10000000).toList
   val vec = (1 to 10000000).toVector
   assert(measure("lst last")(lst.last) > measure("vec last")(vec.last))
