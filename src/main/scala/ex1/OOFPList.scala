@@ -61,7 +61,14 @@ enum List[A]:
   def span(predicate: A => Boolean): (List[A], List[A]) = foldRight(List[A](), List[A]())
     ((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
   
-  def takeRight(n: Int): List[A] = ???
+  def takeRight(n: Int): List[A] = _take(0, this) 
+    private def _take(n: Int, list: List[A]): List[A] = list match
+      case h::t if (n > 0) => _take(n - 1, t)
+      case h::t if (n == 0) => t
+      case _ => list
+    
+
+    
   def collect(predicate: PartialFunction[A, A]): List[A] = foldLeft((List[A]()))((list, el) => (predicate(el)::list))
 // Factories
 object List:
@@ -83,7 +90,7 @@ object Test extends App:
   println("partition:" + reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
   println("span: " + reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println("span: " + reference.span(_ < 3)) // (List(1, 2), List(3, 4))
-  println(reference.reduce(_ + _)) // 10
-  println(List(10).reduce(_ + _)) // 10
-  println(reference.takeRight(3)) // List(2, 3, 4)
-  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
+  println("reduce: " + reference.reduce(_ + _)) // 10
+  println("reduce: " + List(10).reduce(_ + _)) // 10
+  println("take right: " + reference.takeRight(3)) // List(2, 3, 4)
+  println("collect: " + reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
