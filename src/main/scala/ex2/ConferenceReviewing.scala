@@ -32,7 +32,12 @@ class ConferenceReviewing extends Reviewing:
 
     override def averageWeightedFinalScoreMap: Map[Int, Double] = ???
 
-    override def sortedAcceptedArticles: List[(Int, Double)] = ???
+    override def sortedAcceptedArticles: List[(Int, Double)] = 
+        val accpArticles = acceptedArticles
+        accpArticles.map((article) => (article, averageFinalScore(article)))
+            .toList
+            .sortWith((el1, el2) => el1._2.compareTo(el2._2) < 0)
+
 
     override def acceptedArticles: Set[Int] = 
         internalScores.filter((key, value) => 
@@ -87,5 +92,4 @@ object ConferenceUtility:
             val size = values.size
             var accumulator = 0.0
             for value <- values do accumulator += value
-            println(accumulator / size)
             return accumulator / size
