@@ -30,7 +30,9 @@ class ConferenceReviewing extends Reviewing:
 
 
 
-    override def averageWeightedFinalScoreMap: Map[Int, Double] = ???
+    override def averageWeightedFinalScoreMap: Map[Int, Double] = 
+        internalScores.map((article, questions) => 
+            (article, (questions.average(Question.CONFIDENCE) * questions.average(Question.FINAL))/ConferenceReviewing.AVG_WEIGHTED_VALUE)).toMap
 
     override def sortedAcceptedArticles: List[(Int, Double)] = 
         acceptedArticles.map((article) => (article, averageFinalScore(article)))
@@ -84,11 +86,12 @@ class ConferenceReviewing extends Reviewing:
 object ConferenceReviewing:
     private val AVERAGE_FINAL = 5.0
     private val RELEVANCE_LOWER_BOUND = 8
+    private val AVG_WEIGHTED_VALUE = 10
 object ConferenceUtility:
     extension (map: Map[Question, ArrayBuffer[Int]])
         def average(key: Question): Double = 
             val values = map(key)
             val size = values.size
-            var accumulator = 0.0
-            for value <- values do accumulator += value
+            var accumulator: Double = values.sum
+            println("Average of: " + key + " is -> " + accumulator/size)
             return accumulator / size
