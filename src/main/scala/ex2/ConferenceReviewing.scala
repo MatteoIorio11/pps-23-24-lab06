@@ -6,7 +6,7 @@ enum Question:
     case CONFIDENCE
     case FINAL
 
-trait ConferenceReviewing:
+trait Reviewing:
     def loadReview(article: Int, scores: Map[Question, Int]): Unit
     def loadReview(article: Int, relevance: Int, significance: Int, confidence: Int, fin: Int): Unit
     def orderedScores(article: Int, question: Question): List[Int]
@@ -15,5 +15,7 @@ trait ConferenceReviewing:
     def sortedAcceptedArticles: List[(Int, Double)]
     def averageWeightedFinalScoreMap: Map[Int, Double]
 
-object ConferenceReviewing:
+class ConferenceReviewing extends Reviewing:
+
+
 
