@@ -18,4 +18,4 @@ class ReviewTest:
         val confidence = 1
         val fin = 1
         confReview.loadReview(article, relevance, significance, confidence, fin)
-        
+
