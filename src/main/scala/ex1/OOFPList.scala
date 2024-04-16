@@ -59,9 +59,9 @@ enum List[A]:
   def partition(predicate: A => Boolean): (List[A], List[A]) =
     foldRight(List[A](), List[A]())((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
 
-  def span(predicate: A => Boolean): (List[A], List[A]) = foldWithPredicate(predicate)(this)
+  def span(predicate: A => Boolean): (List[A], List[A]) = takeLeft(predicate)(this)
 
-  private def foldWithPredicate(predicate: A => Boolean)(list: List[A]): (List[A], List[A]) =
+  private def takeLeft(predicate: A => Boolean)(list: List[A]): (List[A], List[A]) =
     var listA = List[A]()
     var listB = List[A]()
     var continue = true
