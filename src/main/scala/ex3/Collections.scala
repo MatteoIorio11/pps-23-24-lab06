@@ -6,6 +6,7 @@ import scala.concurrent.duration.FiniteDuration
 import scala.collection.mutable.ListBuffer
 import java.util.Random
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.HashSet
 
 object PerformanceUtils:
   case class MeasurementResults[T](objectName: String, result: T, duration: FiniteDuration) extends Ordered[MeasurementResults[_]]:
@@ -25,6 +26,9 @@ object PerformanceUtils:
 
   def measureAll[A, T](operation: String)(expr: scala.collection.Seq[A]=> T)(lists: List[scala.collection.Seq[A]]): List[MeasurementResults[T]] = 
     lists.map(list => measure(operation, list.getClass().toString())(expr(list))).toList
+
+  def measureAllSets[T](operation: String)(expr: scala.collection.Set[Int]=> T)(lists: List[scala.collection.Set[Int]]): List[MeasurementResults[T]] =
+    lists.map(set => measure(operation, set.getClass().toString())(expr(set))).toList
 @main def checkPerformance: Unit =
   import PerformanceUtils.*
   
@@ -49,13 +53,6 @@ object PerformanceUtils:
   measureAll("Drop an element")(list => list.drop(randomUpdateIndex))(List(immList, mutList))
     .sorted
     .foreach(m => println(m))
-
-  //assert(measure("[Immutable List] Get element")(immList(position)) > measure("[Mutable List] Get element")(mutList(position)))
-  separate
-  println("Random position index: " + randomUpdateIndex)
-  //assert(measure("[Immutable List] Update element")(immList.updated(randomUpdateIndex, 2)) > measure("[Mutable List] Update Element")(mutList.update(randomUpdateIndex, 1))) 
-  separate
-  //assert(measure("[Immutable List] Remove element")(immList.drop(randomUpdateIndex)) < measure("[Mutable List] Remove element")(mutList.drop(randomUpdateIndex))) 
   immList = null
   mutList = null
   /* Indexed sequences: Vector, Array, ArrayBuffer */
@@ -80,10 +77,14 @@ object PerformanceUtils:
   array = null
   arrayBuffer = null
   /* Sets */
+  separate
   println("[Sets]")
-  /* Maps */
-
-  /* Comparison */
-  val lst = (1 to 10000000).toList
-  val vec = (1 to 10000000).toVector
+  var immHashSet = scala.collection.immutable.HashSet.from(rangeValues)
+  var mutHashSet = scala.collection.mutable.HashSet.from(rangeValues)
+  measureAllSets("[Sets]: Get element")(inputSet => inputSet(randomUpdateIndex))(List(mutHashSet, immHashSet))
+    .sorted
+    .foreach(m => println(m))
+  measureAllSets("[Sets]: Remove element")(inputSet => inputSet.drop(randomUpdateIndex))(List(mutHashSet, immHashSet))
+    .sorted
+    .foreach(m => println(m))
   //assert(measure("lst last")(lst.last) > measure("vec last")(vec.last))
