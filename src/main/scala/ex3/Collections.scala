@@ -7,6 +7,7 @@ import scala.collection.mutable.ListBuffer
 import java.util.Random
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashSet
+import ex3.PerformanceUtils.MeasurementResults
 
 object PerformanceUtils:
   case class MeasurementResults[T](objectName: String, result: T, duration: FiniteDuration) extends Ordered[MeasurementResults[_]]:
@@ -29,6 +30,12 @@ object PerformanceUtils:
 
   def measureAllSets[T](operation: String)(expr: scala.collection.Set[Int]=> T)(lists: List[scala.collection.Set[Int]]): List[MeasurementResults[T]] =
     lists.map(set => measure(operation, set.getClass().toString())(expr(set))).toList
+
+  def measureAllMap[T](operation: String)(expr: scala.collection.Map[Int, Int] => T)(list: List[collection.Map[Int, Int]]): List[MeasurementResults[T]] =
+    list.map(m => measure(operation, m.getClass().toString())(expr(m))).toList   
+
+
+
 @main def checkPerformance: Unit =
   import PerformanceUtils.*
   
@@ -87,4 +94,17 @@ object PerformanceUtils:
   measureAllSets("[Sets]: Remove element")(inputSet => inputSet.drop(randomUpdateIndex))(List(mutHashSet, immHashSet))
     .sorted
     .foreach(m => println(m))
-  //assert(measure("lst last")(lst.last) > measure("vec last")(vec.last))
+  /* Maps */
+  immHashSet = null
+  mutHashSet = null
+  separate
+  println("[Maps]")
+  var immHashMap = scala.collection.immutable.HashMap.from(rangeValues.map(el => (el, el)))
+  var mutHashMap = scala.collection.mutable.HashMap.from(rangeValues.map(el => (el, el)))
+  measureAllMap("[Maps]: Get element")(m => m.get(randomUpdateIndex))(List(immHashMap, mutHashMap))
+    .sorted
+    .foreach(m => println(m))
+  measureAllMap("[Maps]: Drop key")(m => m - position)(List(immHashMap, mutHashMap))
+    .sorted
+    .foreach(m => println(m))
+  
