@@ -1,5 +1,7 @@
 package ex1
 
+import scala.compiletime.ops.boolean
+
 // List as a pure interface
 enum List[A]:
   case ::(h: A, t: List[A])
@@ -59,7 +61,16 @@ enum List[A]:
   def partition(predicate: A => Boolean): (List[A], List[A]) =
     foldRight(List[A](), List[A]())((el, t) => if predicate(el) then (el::t._1, t._2) else (t._1, el::t._2))
 
-  def span(predicate: A => Boolean): (List[A], List[A]) = takeLeft(predicate)(this)
+  def span(predicate: A => Boolean): (List[A], List[A]) = takeLeftRec(predicate, this, List(), List())//takeLeft(predicate)(this)
+
+  @annotation.tailrec
+  private def takeLeftRec(predicate: A => Boolean, list: List[A], res1: List[A], res2: List[A]): (List[A], List[A]) =  list match
+    case h :: t if predicate(h) => takeLeftRec(predicate = predicate, list = t, res1 = res1.append(h::Nil()), res2 = res2)
+    case h :: t => (res1, h::t)
+    case Nil() => (res1, res2)
+  
+
+
 
   private def takeLeft(predicate: A => Boolean)(list: List[A]): (List[A], List[A]) =
     var listA = List[A]()
